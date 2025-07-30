@@ -7,21 +7,18 @@ interface ErrorAlertProps {
 }
 
 export const ErrorAlert: React.FC<ErrorAlertProps> = ({ message, onClose }) => {
+  if (!message) return null;
+
   return (
-    <div className="mb-6 bg-error-50 border border-error-200 rounded-lg p-4">
-      <div className="flex items-start">
-        <AlertCircle className="w-5 h-5 text-error-500 mt-0.5 mr-3 flex-shrink-0" />
-        <div className="flex-1">
-          <h3 className="text-sm font-medium text-error-800">Error</h3>
-          <p className="text-sm text-error-700 mt-1">{message}</p>
-        </div>
-        <button
-          onClick={onClose}
-          className="ml-3 text-error-400 hover:text-error-600 transition-colors duration-200"
-        >
-          <X className="w-5 h-5" />
-        </button>
+    <div className="alert alert-error mb-6">
+      <AlertCircle className="h-5 w-5" />
+      <div className="flex-1">
+        <h3 className="font-bold">An Error Occurred</h3>
+        <p className="text-xs">{message}</p>
       </div>
+      <button onClick={onClose} className="btn-icon btn-sm">
+        <X className="h-4 w-4" />
+      </button>
     </div>
   );
 };

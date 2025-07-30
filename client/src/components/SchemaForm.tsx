@@ -191,17 +191,22 @@ export const SchemaForm: React.FC<SchemaFormProps> = ({
                   <span className="text-text-primary text-right">{actor.username}</span>
                 </div>
                 {actor.description && (
-            </div>
-
-            {required.length > 0 && (
-              <div className="mt-4 pt-4 border-t border-gray-200">
-                <div className="flex items-start space-x-2">
-                  <AlertTriangle className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" />
                   <div>
-                    <p className="text-sm font-medium text-gray-700">Required Fields</p>
-                    <ul className="text-sm text-gray-600 mt-1">
+                    <span className="font-medium text-text-secondary">Description:</span>
+                    <p className="text-text-primary mt-1">{actor.description}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+            {required.length > 0 && (
+              <div className="card-footer p-6 border-t border-border">
+                <div className="flex items-start gap-3">
+                  <AlertTriangle className="h-5 w-5 text-amber-400 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <h4 className="text-sm font-semibold text-text-primary">Required Fields</h4>
+                    <ul className="text-xs text-text-secondary mt-2 list-disc list-inside space-y-1">
                       {required.map(field => (
-                        <li key={field}>• {properties[field]?.title || field}</li>
+                        <li key={field}>{properties[field]?.title || field}</li>
                       ))}
                     </ul>
                   </div>
