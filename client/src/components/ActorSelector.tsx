@@ -10,85 +10,72 @@ interface ActorSelectorProps {
 
 export const ActorSelector: React.FC<ActorSelectorProps> = ({ actors, onSelect, loading }) => {
   const formatDate = (dateString?: string) => {
-    if (!dateString) return 'Never';
+    if (!dateString) return 'N/A';
     return new Date(dateString).toLocaleDateString();
   };
 
   return (
-    <div>
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Select an Actor</h2>
-        <p className="text-gray-600">Choose from your available actors to execute</p>
+    <div className="space-y-8">
+      <div className="text-center">
+        <h2 className="text-3xl font-bold tracking-tight text-text-primary">Select an Actor</h2>
+        <p className="mt-2 text-lg text-text-secondary">Choose from your available actors to run.</p>
       </div>
 
       {actors.length === 0 ? (
-        <div className="card p-8 text-center">
-          <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Play className="w-8 h-8 text-gray-400" />
-          </div>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No Actors Found</h3>
-          <p className="text-gray-600">You don't have any actors in your Apify account yet.</p>
+        <div className="card text-center p-12">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+              <Play className="h-6 w-6 text-primary" />
+            </div>
+            <h3 className="mt-4 text-lg font-medium text-text-primary">No Actors Found</h3>
+            <p className="mt-1 text-sm text-text-secondary">You don't have any actors in your Apify account yet.</p>
         </div>
       ) : (
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {actors.map((actor) => (
             <div
               key={actor.id}
-              className="card p-6 hover:shadow-lg transition-shadow duration-200 cursor-pointer border-2 border-transparent hover:border-primary-200"
+              className="card p-6 flex flex-col justify-between group rounded-lg border-2 border-border bg-surface transition-all duration-200 hover:border-primary hover:shadow-lg cursor-pointer"
               onClick={() => !loading && onSelect(actor)}
             >
-              <div className="flex items-start justify-between mb-3">
-                <div className="flex items-center space-x-2">
-                  <User className="w-4 h-4 text-gray-400" />
-                  <span className="text-sm text-gray-600">{actor.username}</span>
-                </div>
-                <div className="flex items-center space-x-1">
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2 text-sm text-text-secondary">
+                    <User className="h-4 w-4" />
+                    <span>{actor.username}</span>
+                  </div>
                   {actor.isPublic ? (
-                    <div title="Public actor">
-                      <Globe className="w-4 h-4 text-green-500" />
-                    </div>
-                  ) : (
-                    <div title="Private actor">
-                      <Lock className="w-4 h-4 text-gray-400" />
-                    </div>
+                      <div className="flex items-center gap-1 text-xs font-medium text-green-400 bg-green-900/50 px-2 py-1 rounded-full">
+                        <Globe className="h-3 w-3" />
+                        <span>Public</span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-1 text-xs font-medium text-amber-400 bg-amber-900/50 px-2 py-1 rounded-full">
+                        <Lock className="h-3 w-3" />
+                        <span>Private</span>
+                      </div>
                   )}
                 </div>
-              </div>
 
-              <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2">
-                {actor.title || actor.name}
-              </h3>
+                <h3 className="font-bold text-text-primary group-hover:text-primary transition-colors duration-200">
+                  {actor.title || actor.name}
+                </h3>
 
-              {actor.description && (
-                <p className="text-sm text-gray-600 mb-3 line-clamp-3">
-                  {actor.description}
-                </p>
-              )}
-
-              <div className="flex items-center justify-between text-xs text-gray-500">
-                <div className="flex items-center space-x-1">
-                  <Play className="w-3 h-3" />
-                  <span>{actor.stats?.totalRuns || 0} runs</span>
-                </div>
-                {actor.stats?.lastRunStartedAt && (
-                  <div className="flex items-center space-x-1">
-                    <Calendar className="w-3 h-3" />
-                    <span>Last run: {formatDate(actor.stats.lastRunStartedAt)}</span>
-                  </div>
+                {actor.description && (
+                  <p className="text-sm text-text-secondary mt-2 line-clamp-3">
+                    {actor.description}
+                  </p>
                 )}
               </div>
 
-              <div className="mt-4 pt-4 border-t border-gray-100">
-                <button
-                  className="btn-primary w-full text-sm"
-                  disabled={loading}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onSelect(actor);
-                  }}
-                >
-                  {loading ? 'Loading...' : 'Select Actor'}
-                </button>
+              <div className="mt-6 pt-4 border-t border-border/50 text-xs text-text-secondary flex justify-between items-center">
+                <div className="flex items-center gap-1.5">
+                  <Play className="h-3 w-3" />
+                  <span>{actor.stats?.totalRuns || 0} runs</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Calendar className="h-3 w-3" />
+                  <span>{formatDate(actor.stats?.lastRunStartedAt)}</span>
+                </div>
               </div>
             </div>
           ))}

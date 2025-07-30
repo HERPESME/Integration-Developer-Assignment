@@ -18,24 +18,20 @@ export const SchemaForm: React.FC<SchemaFormProps> = ({
   onBack, 
   loading 
 }) => {
-  const [formData, setFormData] = useState<Record<string, any>>({});
   const { register, handleSubmit, formState: { errors }, setValue, watch } = useForm();
 
   const properties = schema.schema.properties || {};
   const required = schema.schema.required || [];
 
   useEffect(() => {
-    // Set default values from schema
     Object.entries(properties).forEach(([key, prop]: [string, any]) => {
       if (prop.default !== undefined) {
         setValue(key, prop.default);
-        setFormData(prev => ({ ...prev, [key]: prop.default }));
       }
     });
   }, [properties, setValue]);
 
   const handleFormSubmit = (data: any) => {
-    // Clean up the data - remove empty strings and null values
     const cleanedData: Record<string, any> = {};
     Object.entries(data).forEach(([key, value]) => {
       if (value !== '' && value !== null && value !== undefined) {
@@ -65,12 +61,13 @@ export const SchemaForm: React.FC<SchemaFormProps> = ({
     const commonProps = {
       id: fieldId,
       ...register(key, {
-        required: isRequired ? `${key} is required` : false,
-        ...(prop.minimum && { min: { value: prop.minimum, message: `Minimum value is ${prop.minimum}` } }),
-        ...(prop.maximum && { max: { value: prop.maximum, message: `Maximum value is ${prop.maximum}` } }),
+        required: isRequired ? `${prop.title || key} is required` : false,
+        ...(prop.minimum !== undefined && { min: { value: prop.minimum, message: `Minimum value is ${prop.minimum}` } }),
+        ...(prop.maximum !== undefined && { max: { value: prop.maximum, message: `Maximum value is ${prop.maximum}` } }),
       }),
       className: "input-field",
-      disabled: loading
+      disabled: loading,
+      placeholder: prop.description || `Enter ${key}`,
     };
 
     switch (prop.type) {
@@ -80,154 +77,99 @@ export const SchemaForm: React.FC<SchemaFormProps> = ({
             <select {...commonProps}>
               <option value="">Select an option</option>
               {prop.enum.map((option: string) => (
-                <option key={option} value={option}>{option}</option>
+                <option key={option} value={option}>{prop.enumTitles?.[option] || option}</option>
               ))}
             </select>
           );
         }
-        if (prop.format === 'textarea' || (prop.description && prop.description.includes('long'))) {
-          return (
-            <textarea
-              {...commonProps}
-              rows={4}
-              placeholder={prop.description || `Enter ${key}`}
-            />
-          );
+        if (prop.format === 'textarea' || (prop.description && prop.description.length > 100)) {
+          return <textarea {...commonProps} rows={4} />;
         }
-        return (
-          <input
-            {...commonProps}
-            type={prop.format === 'uri' ? 'url' : 'text'}
-            placeholder={prop.description || `Enter ${key}`}
-          />
-        );
+        return <input {...commonProps} type={prop.format === 'uri' ? 'url' : 'text'} />;
 
       case 'number':
       case 'integer':
-        return (
-          <input
-            {...commonProps}
-            type="number"
-            step={prop.type === 'integer' ? '1' : 'any'}
-            placeholder={prop.description || `Enter ${key}`}
-          />
-        );
+        return <input {...commonProps} type="number" step={prop.type === 'integer' ? '1' : 'any'} />;
 
       case 'boolean':
         return (
-          <div className="flex items-center">
-            <input
-              {...commonProps}
-              type="checkbox"
-              className="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500 focus:ring-2"
-            />
-            <label htmlFor={fieldId} className="ml-2 text-sm text-gray-700">
-              {prop.description || `Enable ${key}`}
-            </label>
-          </div>
+          <label htmlFor={fieldId} className="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" {...register(key)} id={fieldId} className="sr-only peer" disabled={loading} />
+            <div className="w-11 h-6 bg-border rounded-full peer peer-focus:ring-2 peer-focus:ring-primary-focus peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+            <span className="ml-3 text-sm font-medium text-text-secondary">{prop.description || `Enable ${key}`}</span>
+          </label>
         );
 
       case 'array':
         return (
           <div>
-            <textarea
-              {...commonProps}
-              rows={3}
-              placeholder={`Enter ${key} (JSON array or comma-separated values)`}
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              Enter as JSON array (e.g., ["item1", "item2"]) or comma-separated values
-            </p>
+            <textarea {...commonProps} rows={3} placeholder={`Enter a JSON array or comma-separated values`} />
+            <p className="text-xs text-text-secondary mt-1">e.g., ["item1", "item2"] or item1, item2</p>
           </div>
         );
 
       case 'object':
-        return (
-          <textarea
-            {...commonProps}
-            rows={4}
-            placeholder={`Enter ${key} as JSON object`}
-          />
-        );
+        return <textarea {...commonProps} rows={4} placeholder={`Enter a valid JSON object`} />;
 
       default:
-        return (
-          <input
-            {...commonProps}
-            type="text"
-            placeholder={prop.description || `Enter ${key}`}
-          />
-        );
+        return <input {...commonProps} type="text" />;
     }
   };
 
   return (
-    <div>
-      <div className="mb-6">
+    <div className="space-y-8">
+      <div>
         <button
           onClick={onBack}
-          className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 mb-4"
+          className="inline-flex items-center gap-2 rounded-md bg-surface px-3 py-2 text-sm font-medium text-text-secondary transition-colors hover:bg-border hover:text-text-primary focus:outline-none focus:ring-2 focus:ring-primary-focus focus:ring-offset-2 focus:ring-offset-background mb-6"
           disabled={loading}
         >
-          <ArrowLeft className="w-4 h-4" />
+          <ArrowLeft className="h-4 w-4" />
           <span>Back to Actors</span>
         </button>
-        
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Configure Actor Input</h2>
-        <div className="flex items-center space-x-2 text-gray-600">
-          <span>{actor.title || actor.name}</span>
-          <span>•</span>
-          <span>{actor.username}</span>
+        <div className="text-center">
+          <h2 className="text-3xl font-bold tracking-tight text-text-primary">Configure Input</h2>
+          <p className="mt-2 text-lg text-text-secondary">Provide the inputs for <span className='font-bold text-primary'>{actor.title || actor.name}</span></p>
         </div>
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-6">
+      <div className="grid lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2">
-          <div className="card p-6">
+          <div className="card">
             {Object.keys(properties).length === 0 ? (
-              <div className="text-center py-8">
-                <Info className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">No Input Schema</h3>
-                <p className="text-gray-600 mb-4">This actor doesn't require any input parameters.</p>
-                <button
-                  onClick={() => onSubmit({})}
-                  disabled={loading}
-                  className="btn-primary"
-                >
+              <div className="card-content text-center p-12">
+                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+                  <Info className="h-6 w-6 text-primary" />
+                </div>
+                <h3 className="mt-4 text-lg font-medium text-text-primary">No Input Required</h3>
+                <p className="mt-1 text-sm text-text-secondary mb-6">This actor runs without any input parameters.</p>
+                <button onClick={() => onSubmit({})} disabled={loading} className="btn-primary">
                   {loading ? 'Executing...' : 'Run Actor'}
                 </button>
               </div>
             ) : (
-              <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
-                {Object.entries(properties).map(([key, prop]: [string, any]) => (
-                  <div key={key}>
-                    <label htmlFor={`field-${key}`} className="block text-sm font-medium text-gray-700 mb-2">
-                      {prop.title || key}
-                      {required.includes(key) && (
-                        <span className="text-error-500 ml-1">*</span>
+              <form onSubmit={handleSubmit(handleFormSubmit)}>
+                <div className="card-content p-8 space-y-6">
+                  {Object.entries(properties).map(([key, prop]: [string, any]) => (
+                    <div key={key}>
+                      <label htmlFor={`field-${key}`} className="block text-sm font-medium text-text-primary mb-1">
+                        {prop.title || key}
+                        {required.includes(key) && <span className="text-error ml-1">*</span>}
+                      </label>
+                      {prop.description && (
+                        <p className="text-xs text-text-secondary mb-2">{prop.description}</p>
                       )}
-                    </label>
-                    
-                    {renderField(key, prop)}
-                    
-                    {prop.description && (
-                      <p className="text-sm text-gray-500 mt-1">{prop.description}</p>
-                    )}
-                    
-                    {errors[key]?.message && (
-                      <p className="text-error-600 text-sm mt-1">{String(errors[key]?.message)}</p>
-                    )}
-                  </div>
-                ))}
-
-                <div className="pt-4 border-t border-gray-200">
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="btn-primary w-full"
-                  >
-                    <Play className="w-4 h-4 mr-2" />
-                    {loading ? 'Executing Actor...' : 'Run Actor'}
+                      {renderField(key, prop)}
+                      {errors[key]?.message && (
+                        <p className="text-error text-sm mt-1">{String(errors[key]?.message)}</p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                <div className="card-footer p-6 border-t border-border">
+                  <button type="submit" disabled={loading} className="btn-primary w-full">
+                    <Play className="h-5 w-5 mr-2" />
+                    {loading ? 'Executing...' : 'Run Actor'}
                   </button>
                 </div>
               </form>
@@ -235,36 +177,20 @@ export const SchemaForm: React.FC<SchemaFormProps> = ({
           </div>
         </div>
 
-        <div className="lg:col-span-1">
-          <div className="card p-6">
-            <h3 className="font-semibold text-gray-900 mb-3">Actor Information</h3>
-            
-            <div className="space-y-3 text-sm">
-              <div>
-                <span className="font-medium text-gray-700">Name:</span>
-                <span className="ml-2 text-gray-600">{actor.name}</span>
-              </div>
-              
-              {actor.description && (
-                <div>
-                  <span className="font-medium text-gray-700">Description:</span>
-                  <p className="text-gray-600 mt-1">{actor.description}</p>
+        <div className="lg:col-span-1 space-y-6">
+          <div className="card">
+            <div className="card-content p-6">
+              <h3 className="font-semibold text-text-primary mb-4">Actor Details</h3>
+              <div className="space-y-3 text-sm">
+                <div className="flex justify-between">
+                  <span className="font-medium text-text-secondary">Name:</span>
+                  <span className="text-text-primary text-right">{actor.name}</span>
                 </div>
-              )}
-              
-              <div>
-                <span className="font-medium text-gray-700">Visibility:</span>
-                <span className="ml-2 text-gray-600">
-                  {actor.isPublic ? 'Public' : 'Private'}
-                </span>
-              </div>
-              
-              {actor.stats?.totalRuns !== undefined && (
-                <div>
-                  <span className="font-medium text-gray-700">Total Runs:</span>
-                  <span className="ml-2 text-gray-600">{actor.stats.totalRuns}</span>
+                <div className="flex justify-between">
+                  <span className="font-medium text-text-secondary">Owner:</span>
+                  <span className="text-text-primary text-right">{actor.username}</span>
                 </div>
-              )}
+                {actor.description && (
             </div>
 
             {required.length > 0 && (

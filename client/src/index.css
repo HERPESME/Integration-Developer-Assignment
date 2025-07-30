@@ -1,27 +1,45 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   body {
-    @apply font-sans antialiased;
+    @apply bg-background text-text-primary font-sans antialiased;
   }
 }
 
 @layer components {
   .btn-primary {
-    @apply bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
+    @apply inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-base font-medium text-white shadow-sm transition-colors hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-primary-focus focus:ring-offset-2 focus:ring-offset-background;
   }
-  
-  .btn-secondary {
-    @apply bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2;
-  }
-  
+
   .input-field {
-    @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent;
+    @apply block w-full rounded-md border-border bg-surface px-3 py-2 text-text-primary shadow-sm placeholder:text-text-secondary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary sm:text-sm;
+  }
+
+  .card {
+    @apply overflow-hidden rounded-lg bg-surface shadow-lg border border-border;
+  }
+
+  .card-header {
+    @apply border-b border-border px-4 py-5 sm:px-6;
+  }
+
+  .card-content {
+    @apply px-4 py-5 sm:p-6;
+  }
+
+  .alert {
+    @apply rounded-md border p-4;
+  }
+
+  .alert-error {
+    @apply border-error bg-red-500/10 text-error;
   }
   
-  .card {
-    @apply bg-white rounded-lg shadow-md border border-gray-200;
+  .alert-success {
+    @apply border-success bg-green-500/10 text-success;
   }
 }

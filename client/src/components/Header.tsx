@@ -8,25 +8,29 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ onReset, showReset }) => {
   return (
-    <header className="bg-white shadow-sm border-b border-gray-200">
-      <div className="container mx-auto px-4 py-4 max-w-4xl">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">A</span>
+    <header className="bg-surface/80 backdrop-blur-lg border-b border-border sticky top-0 z-50">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16">
+          <div className="flex items-center space-x-4">
+            <div className="flex-shrink-0">
+              <svg className="h-8 w-8 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                <path d="M2 17l10 5 10-5" />
+                <path d="M2 12l10 5 10-5" />
+              </svg>
             </div>
             <div>
-              <h1 className="text-xl font-bold text-gray-900">Apify Integration</h1>
-              <p className="text-sm text-gray-600">Professional Actor Execution Platform</p>
+              <h1 className="text-lg font-bold text-text-primary">Apify Runner</h1>
+              <p className="text-xs text-text-secondary">Dynamic Actor Execution</p>
             </div>
           </div>
           
           {showReset && (
             <button
               onClick={onReset}
-              className="flex items-center space-x-2 px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors duration-200"
+              className="inline-flex items-center gap-2 rounded-md bg-surface px-3 py-2 text-sm font-medium text-text-secondary transition-colors hover:bg-border hover:text-text-primary focus:outline-none focus:ring-2 focus:ring-primary-focus focus:ring-offset-2 focus:ring-offset-background"
             >
-              <RefreshCw className="w-4 h-4" />
+              <RefreshCw className="h-4 w-4" />
               <span>New Session</span>
             </button>
           )}

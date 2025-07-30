@@ -96,52 +96,53 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background font-sans text-text-primary">
       <Header onReset={handleReset} showReset={state !== 'auth'} />
-      
-      <main className="container mx-auto px-4 py-8 max-w-4xl">
-        {error && (
-          <ErrorAlert 
-            message={error} 
-            onClose={() => setError(null)} 
-          />
-        )}
-        
-        {loading && <LoadingSpinner />}
-        
-        {state === 'auth' && (
-          <ApiKeyForm 
-            onSubmit={handleApiKeySubmit} 
-            loading={loading} 
-          />
-        )}
-        
-        {state === 'actors' && (
-          <ActorSelector 
-            actors={actors}
-            onSelect={handleActorSelect}
-            loading={loading}
-          />
-        )}
-        
-        {state === 'schema' && selectedActor && actorSchema && (
-          <SchemaForm 
-            actor={selectedActor}
-            schema={actorSchema}
-            onSubmit={handleSchemaSubmit}
-            onBack={handleBackToActors}
-            loading={loading}
-          />
-        )}
-        
-        {state === 'results' && runResult && (
-          <ResultsDisplay 
-            result={runResult}
-            actor={selectedActor}
-            onBack={handleBackToSchema}
-            onNewRun={handleBackToActors}
-          />
-        )}
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="space-y-8">
+          {error && (
+            <ErrorAlert 
+              message={error} 
+              onClose={() => setError(null)} 
+            />
+          )}
+          
+          {/* The loading spinner will be handled inside components for better UX */}
+
+          {state === 'auth' && (
+            <ApiKeyForm 
+              onSubmit={handleApiKeySubmit} 
+              loading={loading} 
+            />
+          )}
+          
+          {state === 'actors' && (
+            <ActorSelector 
+              actors={actors}
+              onSelect={handleActorSelect}
+              loading={loading}
+            />
+          )}
+          
+          {state === 'schema' && selectedActor && actorSchema && (
+            <SchemaForm 
+              actor={selectedActor}
+              schema={actorSchema}
+              onSubmit={handleSchemaSubmit}
+              onBack={handleBackToActors}
+              loading={loading}
+            />
+          )}
+          
+          {state === 'results' && runResult && (
+            <ResultsDisplay 
+              result={runResult}
+              actor={selectedActor}
+              onBack={handleBackToSchema}
+              onNewRun={handleBackToActors}
+            />
+          )}
+        </div>
       </main>
     </div>
   );
