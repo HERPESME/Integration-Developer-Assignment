@@ -21,19 +21,17 @@ A professional web application that demonstrates seamless integration with the A
 
 ## 📸 Screenshots
 
-*A glimpse of the modern, dark-themed interface.*
+Below are screenshots of the application (Pages 1 to 4):
 
-*(Placeholder for screenshot of the API Key Form)*
-**Caption: Secure API Key Authentication**
+| Page 1 | Page 2 |
+|--------|--------|
+| ![Page 1](client/public/Page%201.png) | ![Page 2](client/public/Page%202.png) |
 
-*(Placeholder for screenshot of the Actor Selector)*
-**Caption: Responsive Actor Selection Grid**
+| Page 3 | Page 4 |
+|--------|--------|
+| ![Page 3](client/public/Page%203.png) | ![Page 4](client/public/Page%204.png) |
 
-*(Placeholder for screenshot of the Schema Form)*
-**Caption: Dynamic Input Schema Form**
-
-*(Placeholder for screenshot of the Results Display)*
-**Caption: Comprehensive Results Display**
+---
 
 ## 🚀 Features
 
