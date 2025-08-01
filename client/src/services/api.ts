@@ -18,8 +18,18 @@ class ApifyApiService {
   }
 
   async getActors(): Promise<{ actors: Actor[] }> {
-    const response = await this.api.get('/actors');
-    return response.data;
+    try {
+      const response = await this.api.get('/actors');
+      return response.data;
+    } catch (error: any) {
+      // If we get a 401 with actors data, throw a custom error to pass the actors
+      if (error.response?.status === 401 && error.response?.data?.actors) {
+        const customError = new Error('Invalid API key with fallback actors');
+        (customError as any).response = error.response;
+        throw customError;
+      }
+      throw error;
+    }
   }
 
   async getActorSchema(actorId: string): Promise<ActorSchema> {

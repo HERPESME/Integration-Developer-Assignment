@@ -4,7 +4,6 @@ import { ActorSelector } from './components/ActorSelector';
 import { SchemaForm } from './components/SchemaForm';
 import { ResultsDisplay } from './components/ResultsDisplay';
 import { Header } from './components/Header';
-import { LoadingSpinner } from './components/LoadingSpinner';
 import { ErrorAlert } from './components/ErrorAlert';
 import { Actor, ActorSchema, RunResult } from './types';
 import { apifyApi } from './services/api';
@@ -13,7 +12,6 @@ type AppState = 'auth' | 'actors' | 'schema' | 'results';
 
 function App() {
   const [state, setState] = useState<AppState>('auth');
-  const [apiKey, setApiKey] = useState<string>('');
   const [actors, setActors] = useState<Actor[]>([]);
   const [selectedActor, setSelectedActor] = useState<Actor | null>(null);
   const [actorSchema, setActorSchema] = useState<ActorSchema | null>(null);
@@ -28,11 +26,17 @@ function App() {
     try {
       apifyApi.setApiKey(key);
       const actorsData = await apifyApi.getActors();
-      setApiKey(key);
       setActors(actorsData.actors);
       setState('actors');
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to authenticate. Please check your API key.');
+      // Check if the error response includes actors (for testing with public actors)
+      if (err.response?.data?.actors) {
+        setActors(err.response.data.actors);
+        setState('actors');
+        setError('Using public actors for testing. Please get a valid API key for full functionality.');
+      } else {
+        setError(err.response?.data?.message || 'Failed to authenticate. Please check your API key.');
+      }
     } finally {
       setLoading(false);
     }
@@ -73,7 +77,6 @@ function App() {
 
   const handleReset = () => {
     setState('auth');
-    setApiKey('');
     setActors([]);
     setSelectedActor(null);
     setActorSchema(null);

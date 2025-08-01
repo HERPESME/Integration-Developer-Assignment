@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { ArrowLeft, Play, Info, AlertTriangle } from 'lucide-react';
 import { Actor, ActorSchema } from '../types';
@@ -18,10 +18,21 @@ export const SchemaForm: React.FC<SchemaFormProps> = ({
   onBack, 
   loading 
 }) => {
-  const { register, handleSubmit, formState: { errors }, setValue, watch } = useForm();
+  console.log('Received schema in form:', JSON.stringify(schema, null, 2));
+  const { register, handleSubmit, formState: { errors }, setValue } = useForm();
 
-  const properties = schema.schema.properties || {};
-  const required = schema.schema.required || [];
+  // Handle different schema structures
+  const properties = useMemo(() => 
+    schema.schema?.properties || schema.properties || {}, 
+    [schema.schema?.properties, schema.properties]
+  );
+  const required = useMemo(() => 
+    schema.schema?.required || schema.required || [], 
+    [schema.schema?.required, schema.required]
+  );
+  
+  console.log('Extracted properties:', Object.keys(properties));
+  console.log('Required fields:', required);
 
   useEffect(() => {
     Object.entries(properties).forEach(([key, prop]: [string, any]) => {
@@ -44,7 +55,14 @@ export const SchemaForm: React.FC<SchemaFormProps> = ({
           try {
             cleanedData[key] = JSON.parse(value);
           } catch {
-            cleanedData[key] = value.split(',').map(v => v.trim());
+            // If it's not valid JSON, treat it as a single item or comma-separated list
+            const trimmedValue = value.trim();
+            if (trimmedValue.includes(',')) {
+              cleanedData[key] = trimmedValue.split(',').map(v => v.trim());
+            } else {
+              // Single item - wrap in array
+              cleanedData[key] = [trimmedValue];
+            }
           }
         } else {
           cleanedData[key] = value;
@@ -103,8 +121,13 @@ export const SchemaForm: React.FC<SchemaFormProps> = ({
       case 'array':
         return (
           <div>
-            <textarea {...commonProps} rows={3} placeholder={`Enter a JSON array or comma-separated values`} />
-            <p className="text-xs text-text-secondary mt-1">e.g., ["item1", "item2"] or item1, item2</p>
+            <textarea {...commonProps} rows={3} placeholder={`Enter URLs separated by commas or as JSON array`} />
+            <p className="text-xs text-text-secondary mt-1">
+              {prop.items?.format === 'uri' 
+                ? 'e.g., https://example.com, https://example.org or ["https://example.com", "https://example.org"]'
+                : 'e.g., item1, item2 or ["item1", "item2"]'
+              }
+            </p>
           </div>
         );
 
@@ -205,7 +228,7 @@ export const SchemaForm: React.FC<SchemaFormProps> = ({
                   <div>
                     <h4 className="text-sm font-semibold text-text-primary">Required Fields</h4>
                     <ul className="text-xs text-text-secondary mt-2 list-disc list-inside space-y-1">
-                      {required.map(field => (
+                      {required.map((field: string) => (
                         <li key={field}>{properties[field]?.title || field}</li>
                       ))}
                     </ul>

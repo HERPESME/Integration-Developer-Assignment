@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Play, CheckCircle, XCircle, Clock, ExternalLink, Copy, Download } from 'lucide-react';
+import { ArrowLeft, CheckCircle, XCircle, Clock, ExternalLink, Copy, Download } from 'lucide-react';
 import { RunResult, Actor } from '../types';
 
 interface ResultsDisplayProps {
@@ -16,25 +16,6 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   onNewRun 
 }) => {
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
-
-  const formatDate = (dateString: string) => new Date(dateString).toLocaleString();
-
-  const formatDuration = (durationMs?: number) => {
-    if (durationMs === undefined) return 'N/A';
-    const seconds = Math.round(durationMs / 1000);
-    if (seconds < 60) return `${seconds}s`;
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${minutes}m ${remainingSeconds}s`;
-  };
-
-  const formatBytes = (bytes?: number) => {
-    if (bytes === undefined) return 'N/A';
-    if (bytes === 0) return '0 B';
-    const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(1024));
-    return `${parseFloat((bytes / Math.pow(1024, i)).toFixed(2))} ${sizes[i]}`;
-  };
 
   const copyToClipboard = async (text: string, index: number) => {
     try {
@@ -74,15 +55,6 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
 
   const statusInfo = getStatusInfo();
   const StatusIcon = statusInfo.icon;
-
-  const renderStat = (label: string, value: string | number | undefined) => (
-    value !== undefined && (
-      <div className="flex justify-between items-center">
-        <span className="text-text-secondary font-medium">{label}:</span>
-        <span className="text-text-primary font-mono">{value}</span>
-      </div>
-    )
-  );
 
   return (
     <div className="space-y-8">

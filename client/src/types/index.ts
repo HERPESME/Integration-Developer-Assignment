@@ -12,19 +12,25 @@ export interface Actor {
 }
 
 export interface ActorSchema {
-  schema: {
+  schema?: {
     type: string;
     properties?: Record<string, any>;
     required?: string[];
     title?: string;
     description?: string;
   };
-  actorInfo: {
+  actorInfo?: {
     id: string;
     name: string;
     title: string;
     description?: string;
   };
+  // Allow schema properties at the top level as well
+  properties?: Record<string, any>;
+  required?: string[];
+  type?: string;
+  title?: string;
+  description?: string;
 }
 
 export interface RunResult {
